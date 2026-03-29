@@ -101,5 +101,21 @@ async def list_handler(message: types.Message):
             await message.answer("Пример: /delete 1")
             return
 
-        delete_task(int(args), message.from_user.id)
+        index = int(args)
+
+        tasks = get_tasks(message.from_user.id)
+
+        if not tasks:
+            await message.answer("Список пуст")
+            return
+
+        if index < 1 or index > len(tasks):
+            await message.answer("Такой задачи нет")
+            return
+
+        # Берем реальный ID задачи
+        task_id = tasks[index - 1][0]
+
+        delete_task(task_id, message.from_user.id)
+
         await message.answer("Удалено")
