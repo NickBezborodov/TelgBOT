@@ -59,16 +59,19 @@ def register_handlers(dp):
 
 
     @dp.message_handler(commands=["list"])
-    async def list_handler(message: types.Message):
+async def list_handler(message: types.Message):
         tasks = get_tasks(message.from_user.id)
 
         if not tasks:
             await message.answer("У тебя нет задач")
             return
 
+        text = "Твои задачи:\n\n"
+
         for i, task in enumerate(tasks, start=1):
-            task_id = task[0]
-            task_text = task[1]
+            text += f"{i}. {task[1]}\n"
+
+        await message.answer(text)
 
             keyboard = InlineKeyboardMarkup()
             button = InlineKeyboardButton(
