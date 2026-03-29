@@ -1,6 +1,7 @@
 from aiogram import types
 from db import add_task, get_tasks, delete_task, update_task
 import requests
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 def register_handlers(dp):
@@ -65,12 +66,28 @@ def register_handlers(dp):
             await message.answer("У тебя нет задач")
             return
 
-        text = "📋 Твои задачи:\n\n"
+        for i, task in enumerate(tasks, start=1):
+            task_id = task[0]
+            task_text = task[1]
 
-        for task in tasks:
-            text += f"🔹 {task[0]}: {task[1]}\n"
+            keyboard = InlineKeyboardMarkup()
+            button = InlineKeyboardButton(
+                text="❌ Удалить",
+                callback_data=f"delete_{task_id}"
+            )
+            keyboard.add(button)
 
-        await message.answer(text)
+            await message.answer(f"{i}. {task_text}", reply_markup=keyboard)
+
+
+     @dp.callback_query_handler(lambda c: c.data.startswith("delete_"))
+     async def delete_callback(callback_query: types.CallbackQuery):
+        task_id = int(callback_query.data.split("_")[1])
+
+        delete_task(task_id, callback_query.from_user.id)
+
+        await callback_query.answer("Удалено")
+        await callback_query.message.delete()
 
 
     @dp.message_handler(commands=["delete"])
