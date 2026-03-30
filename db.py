@@ -29,7 +29,7 @@ def update_task(task_id, user_id, new_text):
     
 def get_tasks(user_id):
     cursor.execute(
-        "SELECT id, text FROM tasks WHERE user_id = ?",
+        "SELECT id, text FROM tasks WHERE user_id = ? ORDER BY id",
         (user_id,)
     )
     return cursor.fetchall()

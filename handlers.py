@@ -1,4 +1,4 @@
-    from aiogram import types
+from aiogram import types
 from db import add_task, get_tasks, delete_task, update_task
 import requests
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -80,8 +80,8 @@ def register_handlers(dp):
             await message.answer(f"{i}. {task_text}", reply_markup=keyboard)
 
 
-     @dp.callback_query_handler(lambda c: c.data.startswith("delete_"))
-     async def delete_callback(callback_query: types.CallbackQuery):
+    @dp.callback_query_handler(lambda c: c.data.startswith("delete_"))
+    async def delete_callback(callback_query: types.CallbackQuery):
         task_id = int(callback_query.data.split("_")[1])
 
         delete_task(task_id, callback_query.from_user.id)
