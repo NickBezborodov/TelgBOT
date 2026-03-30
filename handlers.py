@@ -1,4 +1,4 @@
-from aiogram import types
+    from aiogram import types
 from db import add_task, get_tasks, delete_task, update_task
 import requests
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -59,19 +59,16 @@ def register_handlers(dp):
 
 
     @dp.message_handler(commands=["list"])
-async def list_handler(message: types.Message):
+    async def list_handler(message: types.Message):
         tasks = get_tasks(message.from_user.id)
 
         if not tasks:
             await message.answer("У тебя нет задач")
             return
 
-        text = "Твои задачи:\n\n"
-
         for i, task in enumerate(tasks, start=1):
-            text += f"{i}. {task[1]}\n"
-
-        await message.answer(text)
+            task_id = task[0]
+            task_text = task[1]
 
             keyboard = InlineKeyboardMarkup()
             button = InlineKeyboardButton(
@@ -95,27 +92,19 @@ async def list_handler(message: types.Message):
 
     @dp.message_handler(commands=["delete"])
     async def delete_handler(message: types.Message):
-        args = message.get_args()
-
-        if not args or not args.isdigit():
-            await message.answer("Пример: /delete 1")
+        try:
+            index = int(message.text.split()[1])
+        except:
+            await message.answer("Используй: /delete номер")
             return
-
-        index = int(args)
 
         tasks = get_tasks(message.from_user.id)
-
-        if not tasks:
-            await message.answer("Список пуст")
-            return
 
         if index < 1 or index > len(tasks):
             await message.answer("Такой задачи нет")
             return
 
-        # Берем реальный ID задачи
-        task_id = tasks[index - 1][0]
-
+        task_id = tasks[index - 1][0]  # ВАЖНО
         delete_task(task_id, message.from_user.id)
 
         await message.answer("Удалено")
