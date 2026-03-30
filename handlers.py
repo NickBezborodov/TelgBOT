@@ -63,21 +63,27 @@ def register_handlers(dp):
         tasks = get_tasks(message.from_user.id)
 
         if not tasks:
-            await message.answer("У тебя нет задач")
+            await message.answer("📭 У тебя нет задач")
             return
 
+        text = "📋 Твои задачи:\n\n"
+
+        for i, task in enumerate(tasks, start=1):
+            text += f"🔹 {i}. {task[1]}\n"
+
+        await message.answer(text)
+
+        # кнопки под каждой задачей
         for i, task in enumerate(tasks, start=1):
             task_id = task[0]
-            task_text = task[1]
 
-            keyboard = InlineKeyboardMarkup()
-            button = InlineKeyboardButton(
-                text="❌ Удалить",
-                callback_data=f"delete_{task_id}"
+            keyboard = InlineKeyboardMarkup(row_width=2)
+            keyboard.add(
+                InlineKeyboardButton("✏️ Изменить", callback_data=f"edit_{task_id}"),
+                InlineKeyboardButton("❌ Удалить", callback_data=f"delete_{task_id}")
             )
-            keyboard.add(button)
 
-            await message.answer(f"{i}. {task_text}", reply_markup=keyboard)
+            await message.answer(f"Действия для задачи {i}", reply_markup=keyboard)
 
 
     @dp.callback_query_handler(lambda c: c.data.startswith("delete_"))
@@ -87,7 +93,19 @@ def register_handlers(dp):
         delete_task(task_id, callback_query.from_user.id)
 
         await callback_query.answer("Удалено")
-        await callback_query.message.delete()
+
+        tasks = get_tasks(callback_query.from_user.id)
+
+        if not tasks:
+            await callback_query.message.answer("📭 У тебя нет задач")
+            return
+
+        text = "📋 Твои задачи:\n\n"
+
+        for i, task in enumerate(tasks, start=1):
+            text += f"🔹 {i}. {task[1]}\n"
+
+        await callback_query.message.answer(text)
 
 
     @dp.message_handler(commands=["delete"])
@@ -108,3 +126,8 @@ def register_handlers(dp):
         delete_task(task_id, message.from_user.id)
 
         await message.answer("Удалено")
+        
+        
+        @dp.callback_query_handler(lambda c: c.data.startswith("edit_"))
+        async def edit_callback(callback_query: types.CallbackQuery):
+            await callback_query.answer("Функция в разработке")
