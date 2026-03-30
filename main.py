@@ -4,7 +4,6 @@ from handlers import register_handlers
 import os
 from dotenv import load_dotenv
 import requests
-import telebot
 import flask
 import bs4
 
