@@ -4,7 +4,6 @@ from handlers import register_handlers
 import os
 from dotenv import load_dotenv
 import requests
-import flask
 import bs4
 
 load_dotenv()
