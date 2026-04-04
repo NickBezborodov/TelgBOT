@@ -22,21 +22,6 @@ def register_handlers(dp):
         add_task(message.from_user.id, text)
         await message.answer(f"Добавлено: {text}")
 
-        
-    @dp.message_handler(commands=["quote"])
-    async def quote_handler(message: types.Message):
-        try:
-            response = requests.get("https://api.quotable.io/random")
-            data = response.json()
-
-            quote = data.get("content")
-            author = data.get("author")
-
-            await message.answer(f"{quote}\n\n— {author}")
-
-        except Exception:
-            await message.answer("Ошибка при получении цитаты")
-
     @dp.message_handler(commands=["update"])
     async def update_handler(message: types.Message):
         args = message.get_args()
